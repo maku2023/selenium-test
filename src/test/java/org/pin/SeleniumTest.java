@@ -28,11 +28,12 @@ public class SeleniumTest {
         //
         //
         // webdriver.chrome.driver", "/usr/local/bin/chromedriver"); // Example path for Linux
-        ChromeOptions options = new ChromeOptions();
-        //seArguments("--headless"); // Run in headless mode for Jenkins
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        driver = new ChromeDriver(options);
+       ChromeOptions options = new ChromeOptions();
+options.addArguments("--headless=new"); // Use the updated headless mode
+options.addArguments("--window-size=1920,1080"); // Set a consistent resolution
+options.addArguments("--no-sandbox"); // Fixes "DevToolsActivePort" errors
+options.addArguments("--disable-gpu"); // Recommended for CI stability
+driver = new ChromeDriver(options);
     }
 
     @Test
@@ -69,13 +70,13 @@ public class SeleniumTest {
     @Test
     void gmailLoginTest() {
         WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        GmailLogin.loginToGmail(driver, wait, "processinfonow@gmail.com", "##GallaFesame@@2008");
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20))
+        GmailLogin.loginToGmail(driver, wait, "processgmail.com", "2008");
     }
 
     @Test void displayGoogleChart() {
         WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         try {
             String path = Paths.get("src/test/resources/chart.html").toAbsolutePath().toUri().toString();
             driver.get(path);
