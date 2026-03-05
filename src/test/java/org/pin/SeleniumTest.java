@@ -54,8 +54,8 @@ driver = new ChromeDriver(options);
     }
 
     @Test
-    public void verifySspPage2() {
-        driver.get("https://www.yahoo.com);
+    public void verifySpPage2() {
+        driver.get("https://www.yahoo.com");
         String expectedTitle = "yahoo";
         String actualTitle = driver.getPageSource();
         assertEquals(expectedTitle, actualTitle, "yahoo");
@@ -102,7 +102,7 @@ driver = new ChromeDriver(options);
         }
     }
 
-    @Test void displaySspHrLogin() {
+    @Test void displaySpHrLogin() {
         WebDriver driver = new ChromeDriver();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         try {
