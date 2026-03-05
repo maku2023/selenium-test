@@ -15,123 +15,81 @@ import java.nio.file.Paths;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SeleniumTest {
     private static WebDriver driver;
-
-
-public void setup() {
-    ChromeOptions options = new ChromeOptions();
-    
-    // Automatically use headless mode in Jenkins or via Gradle flag
-    boolean isHeadless = System.getenv("JENKINS_HOME") != null || 
-                         "true".equals(System.getProperty("headless"));
-
-    if (isHeadless) {
-
-  
-options.addArguments("--headless=new"); // Use the updated headless mode
-options.addArguments("--window-size=1920,1080"); // Set a consistent resolution
-options.addArguments("--no-sandbox"); // Fixes "DevToolsActivePort" errors
-options.addArguments("--disable-gpu"); // Recommended for CI stability
-
-        // Selenium Manager (v4.41.0) automatically sets up the driver
-    driver = new ChromeDriver(options);
-            
-}
-
+    private static WebDriverWait wait;
 
     @BeforeAll
     public static void setUp() {
-        // Set the path to the ChromeDriver executable
-        // NOTE: This path must be correct on the Jenkins build agent
-        //System.setProperty("
-        //
-        //
-        // webdriver.chrome.driver", "/usr/local/bin/chromedriver"); // Example path for Linux
-     
-driver = new ChromeDriver(options);
+        ChromeOptions options = new ChromeOptions();
+        
+        // Detect if running in Jenkins or if headless flag is passed
+        boolean isHeadless = System.getenv("JENKINS_HOME") != null || 
+                             "true".equals(System.getProperty("headless"));
+
+        if (isHeadless) {
+            options.addArguments("--headless=new");
+            options.addArguments("--window-size=1920,1080");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--disable-dev-shm-usage");
+        }
+
+        // Selenium 4.41.0 automatically manages the driver executable
+        driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
     @Test
     public void verifyPageTitle() {
         driver.get("https://www.google.com");
-        String expectedTitle = "Google";
-        String actualTitle = driver.getTitle();
-        assertEquals(expectedTitle, actualTitle, "The page title should be 'Google'");
+        assertEquals("Google", driver.getTitle(), "Title should be Google");
     }
-
 
     @Test
     public void verifyPageSource() {
         driver.get("https://www.google.com");
-        String expectedTitle = "Google";
-        String actualTitle = driver.getPageSource();
-        assertEquals(expectedTitle, actualTitle, "The page title should be 'Google'");
+        // Fixed: contains check is safer than exact match for page source
+        assertTrue(driver.getPageSource().contains("Google"), "Source should contain Google");
     }
 
     @Test
     public void verifySpPage2() {
         driver.get("https://www.yahoo.com");
-        String expectedTitle = "yahoo";
-        String actualTitle = driver.getPageSource();
-        assertEquals(expectedTitle, actualTitle, "yahoo");
+        // Fixed: Use getTitle() for title checks, not getPageSource()
+        assertTrue(driver.getTitle().toLowerCase().contains("yahoo"), "Title should contain yahoo");
     }
 
-
-
-    //    @Test
-//    void runGmailLogin() {
-//        GmailLogin.loginToGmail(driver, wait, "...", "...");
-//    }
     @Test
     void gmailLoginTest() {
-        WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        // Removed 'new ChromeDriver()' to use the global headless instance
         GmailLogin.loginToGmail(driver, wait, "processgmail.com", "2008");
     }
 
-    @Test void displayGoogleChart() {
-        WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        try {
-            String path = Paths.get("src/test/resources/chart.html").toAbsolutePath().toUri().toString();
-            driver.get(path);
-            WebElement chart = wait.until( ExpectedConditions.visibilityOfElementLocated(By.id("chart_div")) );
-        assert chart.isDisplayed();
-        }
-        finally {
-            driver.quit();
-        }
+    @Test 
+    void displayGoogleChart() {
+        String path = Paths.get("src/test/resources/chart.html").toAbsolutePath().toUri().toString();
+        driver.get(path);
+        WebElement chart = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("chart_div")));
+        assertTrue(chart.isDisplayed(), "Chart should be visible");
     }
 
-    @Test void displaySppLogin1() {
-        WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        try {
-            String path = Paths.get("src/test/resources/chart.html").toAbsolutePath().toUri().toString();
-            driver.get(path);
-            WebElement chart = wait.until( ExpectedConditions.visibilityOfElementLocated(By.id("chart_div")) );
-            assert chart.isDisplayed();
-        }
-        finally {
-            driver.quit();
-        }
+    @Test 
+    void displaySppLogin1() {
+        String path = Paths.get("src/test/resources/chart.html").toAbsolutePath().toUri().toString();
+        driver.get(path);
+        WebElement chart = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("chart_div")));
+        assertTrue(chart.isDisplayed());
     }
 
-    @Test void displaySpHrLogin() {
-        WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        try {
-            String path = Paths.get("src/test/resources/chart.html").toAbsolutePath().toUri().toString();
-            driver.get(path);
-            WebElement chart = wait.until( ExpectedConditions.visibilityOfElementLocated(By.id("chart_div")) );
-            assert chart.isDisplayed();
-        }
-        finally {
-            driver.quit();
-        }
+    @Test 
+    void displaySpHrLogin() {
+        String path = Paths.get("src/test/resources/chart.html").toAbsolutePath().toUri().toString();
+        driver.get(path);
+        WebElement chart = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("chart_div")));
+        assertTrue(chart.isDisplayed());
     }
 
     @AfterAll
