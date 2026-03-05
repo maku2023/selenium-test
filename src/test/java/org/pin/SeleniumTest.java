@@ -20,6 +20,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SeleniumTest {
     private static WebDriver driver;
 
+
+public void setup() {
+    ChromeOptions options = new ChromeOptions();
+    
+    // Automatically use headless mode in Jenkins or via Gradle flag
+    boolean isHeadless = System.getenv("JENKINS_HOME") != null || 
+                         "true".equals(System.getProperty("headless"));
+
+    if (isHeadless) {
+
+  
+options.addArguments("--headless=new"); // Use the updated headless mode
+options.addArguments("--window-size=1920,1080"); // Set a consistent resolution
+options.addArguments("--no-sandbox"); // Fixes "DevToolsActivePort" errors
+options.addArguments("--disable-gpu"); // Recommended for CI stability
+
+        // Selenium Manager (v4.41.0) automatically sets up the driver
+    driver = new ChromeDriver(options);
+            
+}
+
+
     @BeforeAll
     public static void setUp() {
         // Set the path to the ChromeDriver executable
@@ -28,11 +50,7 @@ public class SeleniumTest {
         //
         //
         // webdriver.chrome.driver", "/usr/local/bin/chromedriver"); // Example path for Linux
-       ChromeOptions options = new ChromeOptions();
-options.addArguments("--headless=new"); // Use the updated headless mode
-options.addArguments("--window-size=1920,1080"); // Set a consistent resolution
-options.addArguments("--no-sandbox"); // Fixes "DevToolsActivePort" errors
-options.addArguments("--disable-gpu"); // Recommended for CI stability
+     
 driver = new ChromeDriver(options);
     }
 
