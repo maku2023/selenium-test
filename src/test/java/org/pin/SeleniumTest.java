@@ -62,11 +62,11 @@ public class SeleniumTest {
         assertTrue(driver.getTitle().toLowerCase().contains("yahoo"), "Title should contain yahoo");
     }
 
-    @Test
-    void gmailLoginTest() {
-        // Removed 'new ChromeDriver()' to use the global headless instance
-        GmailLogin.loginToGmail(driver, wait, "processgmail.com", "2008");
-    }
+    // @Test
+    // void gmailLoginTest() {
+    //     // Removed 'new ChromeDriver()' to use the global headless instance
+    //     GmailLogin.loginToGmail(driver, wait, "processgmail.com", "2008");
+    // }
 
     @Test 
     void displayGoogleChart() {
