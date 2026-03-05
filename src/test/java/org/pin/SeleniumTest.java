@@ -55,10 +55,10 @@ driver = new ChromeDriver(options);
 
     @Test
     public void verifySspPage2() {
-        driver.get("https://www.ssp.usps.gov");
-        String expectedTitle = "LiteBlue | Self-Service Profile (SSP)";
+        driver.get("https://www.yahoo.com);
+        String expectedTitle = "yahoo";
         String actualTitle = driver.getPageSource();
-        assertEquals(expectedTitle, actualTitle, "LiteBlue | Self-Service Profile (SSP)");
+        assertEquals(expectedTitle, actualTitle, "yahoo");
     }
 
 
@@ -70,7 +70,7 @@ driver = new ChromeDriver(options);
     @Test
     void gmailLoginTest() {
         WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20))
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         GmailLogin.loginToGmail(driver, wait, "processgmail.com", "2008");
     }
 
