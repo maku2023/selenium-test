@@ -20,7 +20,7 @@ sourceSets {
 
 dependencies {
     // Updated to 4.41.0 for automatic ChromeDriver management in Jenkins
-    implementation 'org.seleniumhq.selenium:selenium-java:4.41.0' 
+    implementation 'org.seleniumhq.selenium:selenium-java:4.41.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
@@ -30,7 +30,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    
+
     // Pass the headless flag from Jenkins to Java
     systemProperty 'headless', System.getProperty('headless', 'false')
 
@@ -46,9 +46,12 @@ test {
 
     // Generate the summary file
     afterSuite { desc, result ->
-        if (!desc.parent) { 
-            def outputDir = new File("${buildDir}/test-summary")
+        if (!desc.parent) {
+            // Use the modern layout API to avoid the buildDir deprecation warning
+            def outputDir = new File(layout.buildDirectory.asFile.get(), "test-summary")
+
             if (!outputDir.exists()) outputDir.mkdirs()
+
             new File(outputDir, "custom-test-summary.txt").text = """
 Tests run: ${result.testCount}
 Passed:    ${result.successfulTestCount}
@@ -57,7 +60,6 @@ Skipped:   ${result.skippedTestCount}
 """
         }
     }
-
     // This ensures JaCoCo runs automatically after tests
     finalizedBy jacocoTestReport
 }
@@ -66,15 +68,19 @@ jacocoTestReport {
     dependsOn test
     reports {
         // Jenkins JaCoCo plugin REQUIRES xml.required = true
-        xml.required = true 
+        xml.required = true
         html.required = true
         csv.required = false
         // Set the destination if Jenkins is having trouble finding it
-        xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+//        xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+
+        // Fix for deprecated buildDir:
+        xml.outputLocation = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml")
+        html.outputLocation = layout.buildDirectory.dir("reports/jacoco/test/html")
     }
 }
 
 // Application settings
 application {
-    mainClass = 'org.pin.GmailLogin' 
+    mainClass = 'org.pin.GmailLogin'
 }
