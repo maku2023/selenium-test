@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Google Chart Test</title>
+
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', { packages: ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+          const data = google.visualization.arrayToDataTable([
+            ['Year', 'Sales'],
+            ['2020', 1000],
+            ['2021', 1170],
+            ['2022', 660],
+            ['2023', 1030]
+          ]);
+
+          const options = { title: 'Company Performance' };
+
+          const chart = new google.visualization.LineChart(
+            document.getElementById('chart_div')
+          );
+          chart.draw(data, options);
+        }
+    </script>
+</head>
+
+<body>
+<h2>Google Chart Example</h2>
+<div id="chart_div" style="width: 900px; height: 500px;"></div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java'
+    // Apply the application plugin to add support for building an executable jar
+    id 'application'
+    id 'jacoco'
+}
+
+repositories {
+    // Use Maven Central for dependencies
+    mavenCentral()
+}
+
+// Declare the 'libs' directory as a source for local dependencies
+sourceSets {
+    main {
+        runtimeClasspath += files('libs')
+    }
+    test {
+        runtimeClasspath += files('libs')
+        compileClasspath += files('libs')
+    }
+}
+
+dependencies {
+    // Add Selenium dependencies
+    implementation 'org.seleniumhq.selenium:selenium-java:4.18.1' // Use a specific version, e.g., 4.18.1 [2]
+
+    // Add JUnit Jupiter dependencies for testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0' // Use a specific version, e.g., 5.10.0 [3]
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0' // Use a specific version [3]
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'    // Add any local JARs from the 'libs' folder to the compilation/runtime path
+    testImplementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+// Configure the test task to use JUnit Platform
+//tasks.test {
+//    useJUnitPlatform()
+//    testLogging {
+//        events("passed", "skipped", "failed")
+//        showExceptions = true
+//        exceptionFormat = TestExceptionFormat.FULL
+//    }
+//}
+
+test {
+    useJUnitPlatform()
+
+    // Write a custom summary file after tests run
+    afterSuite { desc, result ->
+        if (!desc.parent) { // root suite
+            def file = new File("$buildDir/custom-test-summary.txt")
+            file.text = """
+Tests run: ${result.testCount}
+Passed:    ${result.successfulTestCount}
+Failed:    ${result.failedTestCount}
+Skipped:   ${result.skippedTestCount}
+"""
+        }
+        reports {
+            junitXml.required=true
+            html.required=true
+        }
+
+    }
+
+}
+
+// ... existing configuration ...
+
+tasks.register('runSeleniumTest', JavaExec) {
+    mainClass = 'org.pin.SeleniumTest'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+application { // Fully qualified class name containing main()
+ mainClass = 'GmailLogin'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+jacocoTestReport
+        {
+            dependsOn test
+
+            reports {
+                xml.required.set(true) // ALM upload
+                html.required.set(true) // Human-readable report
+                csv.required.set(false)
+            }
+        }
+
+
+
