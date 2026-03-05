@@ -45,13 +45,22 @@ dependencies {
 //    }
 //}
 
+
 test {
     useJUnitPlatform()
 
-    // Write a custom summary file after tests run
+    // Correct placement for reports
+    reports {
+        junitXml.required = true
+        html.required = true
+    }
+
+    // Correct placement for afterSuite summary
     afterSuite { desc, result ->
         if (!desc.parent) { // root suite
-            def file = new File("$buildDir/custom-test-summary.txt")
+            def outputDir = new File("${buildDir}/test-summary")
+            if (!outputDir.exists()) outputDir.mkdirs()
+            def file = new File(outputDir, "custom-test-summary.txt")
             file.text = """
 Tests run: ${result.testCount}
 Passed:    ${result.successfulTestCount}
@@ -59,40 +68,19 @@ Failed:    ${result.failedTestCount}
 Skipped:   ${result.skippedTestCount}
 """
         }
-        reports {
-            junitXml.required=true
-            html.required=true
-        }
-
     }
 
-}
-
-// ... existing configuration ...
-
-tasks.register('runSeleniumTest', JavaExec) {
-    mainClass = 'org.pin.SeleniumTest'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-application { // Fully qualified class name containing main()
- mainClass = 'GmailLogin'
-}
-
-test {
-    useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
-jacocoTestReport
-        {
-            dependsOn test
 
-            reports {
-                xml.required.set(true) // ALM upload
-                html.required.set(true) // Human-readable report
-                csv.required.set(false)
-            }
-        }
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true 
+        html.required = true
+        csv.required = false
+    }
+}
 
 
 
